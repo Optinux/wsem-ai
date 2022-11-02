@@ -14,20 +14,20 @@ img_height = 128
 img_width = 128
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
-  'dataset',
-  validation_split=0.2,
-  subset="training",
-  seed=420,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
+    'dataset',
+    validation_split=0.2,
+    subset="training",
+    seed=420,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
 
 val_ds = tf.keras.utils.image_dataset_from_directory(
-  'dataset',
-  validation_split=0.2,
-  subset="validation",
-  seed=420,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
+    'dataset',
+    validation_split=0.2,
+    subset="validation",
+    seed=420,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
 
 class_names = train_ds.class_names
 print(class_names)
@@ -45,29 +45,30 @@ first_image = image_batch[0]
 num_classes = len(class_names)
 
 model = Sequential([
-  layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu'),
-  layers.Dense(num_classes)
+    layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
+    layers.Conv2D(16, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(32, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(64, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(num_classes)
 ])
 
 model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(
+                  from_logits=True),
               metrics=['accuracy'])
 
 model.summary()
 
-epochs=5
+epochs = 5
 history = model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=epochs
+    train_ds,
+    validation_data=val_ds,
+    epochs=epochs
 )
 
 acc = history.history['accuracy']
@@ -92,10 +93,11 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 
+
 def predict(path):
-    test_image = image.load_img(path, target_size = (128, 128))
+    test_image = image.load_img(path, target_size=(128, 128))
     test_image = image.img_to_array(test_image)
-    test_image = np.expand_dims(test_image, axis = 0)
+    test_image = np.expand_dims(test_image, axis=0)
     result = model.predict(test_image)
     if result[0][0] == 1:
         prediction = 'classical'
@@ -103,6 +105,7 @@ def predict(path):
         prediction = 'modern'
 
     print(prediction)
+
 
 predict('classic.jpg')
 predict('modern.jpg')
