@@ -5,7 +5,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 
 import matplotlib.pyplot as plt
-from tensorflow.keras.utils import plot_model
+from keras.utils import plot_model
 
 
 # festlegen auf 256x256 da optimale performance zu aufwand ratio
@@ -13,12 +13,12 @@ img_width, img_height = 256, 256
 
 train_data_dir = 'training_set'
 validation_data_dir = 'validation_set'
-nb_train_samples = 4096  # anzahl an training images 1024
-nb_validation_samples = 2048  # anzahl an validation images 512
-epochs = 10  # epochen aka wie viele iterationen 10
+nb_train_samples = 2048  # anzahl an training images 1024
+nb_validation_samples = 1024  # anzahl an validation images 512
+epochs = 50  # epochen aka wie viele iterationen 10
 
 # samples geteilt durch batch size -> wie viel pro schritt in der epoche durch network geboxt werden 32
-batch_size = 32
+batch_size = 16
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -84,7 +84,7 @@ history = model.fit_generator(
 # Generiert das Model als Grafik um Aufbau zu verdeutlichen
 plot_model(
     model,
-    to_file="model.png",
+    to_file="wsem_model.png",
     show_shapes=False,
     show_dtype=False,
     show_layer_names=True,
