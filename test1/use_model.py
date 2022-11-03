@@ -10,13 +10,13 @@ from keras.models import load_model
 import matplotlib.pyplot as plt
 
 accuracy_insg = 0  # gesamte accuracy zu beginn auf null
-accuracy_plot = [0]  # leeres plot array
+accuracy_plot = []  # leere plot list
 
 model = load_model('wsem_model.h5')
 
 # erstellt liste aller files im ausgewählten ordner -> classic oder modern, um auf diese zu predicten
 path = r'G:\GitHub\wsem-ai\test1\validation_set\classic'  # !!!WICHTIG
-list_files = []
+list_files = []  # leere file list
 for root, dirs, files in os.walk(path):
     for file in files:
         list_files.append(os.path.join(root, file))
@@ -34,18 +34,25 @@ for name in list_files:
 
     # insgesamte accuracy -> accuracy alle predicteten bilder zusammen
     accuracy_insg = accuracy_insg + accuracy
-    accuracy_plot[i] = accuracy_insg
-    if i > 10:  # wie oft er predicten soll                                              !!!WICHTIG
-        break
+    # fürs spätere plotten ein array befüllen
+    accuracy_plot.append(accuracy)
+    # print(accuracy_plot)    # debug
 
     i += 1
 
-i = i - 1  # -1 damit auch die richtige anzahl geteilt wird
+    if i > 400:  # wie oft er predicten soll                                              !!!WICHTIG
+        i = i - 1  # -1 damit auch die richtige anzahl geteilt wird
+        break
+
 print("Insgesamte Accuracy von", i, "predicteten Bildern: ", accuracy_insg / i)
 
 # Prediction als witzige Graphen plotten, zeigt Accuracy der Prediction aller predicteten Bilder in einem Graphen
-plt.plot([1, i], [0, accuracy_plot])
-plt.title('Accuracy aller der Predictions')
+# print(accuracy_plot)    # debug
+anzahl_predictions = range(0, i)
+# print(anzahl_predictions)   # debug
+plt.plot(anzahl_predictions, accuracy_plot)
+plt.title(accuracy_insg / i)
+plt.suptitle('Accuracy aller Predictions, wobei durchschnittliche Accuracy: ')
 plt.ylabel('Accuracy | Genauigkeit')
 plt.xlabel('Predictions | Anzahl an Vorhersagen')
 plt.show()
