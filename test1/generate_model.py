@@ -4,15 +4,21 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 
-# festlegen auf 512x512 da optimale performance zu aufwand ratio
-img_width, img_height = 512, 512
+import matplotlib.pyplot as plt
+from tensorflow.keras.utils import plot_model
+
+
+# festlegen auf 256x256 da optimale performance zu aufwand ratio
+img_width, img_height = 256, 256
 
 train_data_dir = 'training_set'
 validation_data_dir = 'validation_set'
-nb_train_samples = 45  # anzahl an training images
-nb_validation_samples = 2  # anzahl an validation images
-epochs = 15  # epochen aka wie viele iterationen
-batch_size = 1  # samples geteilt durch batch size -> wie viel pro epoche durch network geboxt werden
+nb_train_samples = 4096  # anzahl an training images 1024
+nb_validation_samples = 2048  # anzahl an validation images 512
+epochs = 10  # epochen aka wie viele iterationen 10
+
+# samples geteilt durch batch size -> wie viel pro schritt in der epoche durch network geboxt werden 32
+batch_size = 32
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -20,6 +26,8 @@ else:
     # resize falls nicht stimmt (stimmt eigentlich nie)
     input_shape = (img_width, img_height, 3)
 
+
+# aufbau des models
 model = Sequential()
 model.add(Conv2D(32, (2, 2), input_shape=input_shape))
 model.add(Activation('relu'))
@@ -44,6 +52,7 @@ model.compile(loss='binary_crossentropy',
               optimizer='rmsprop',
               metrics=['accuracy'])
 
+
 train_datagen = ImageDataGenerator(
     rescale=1. / 255,
     shear_range=0.2,
@@ -64,11 +73,45 @@ validation_generator = test_datagen.flow_from_directory(
     batch_size=batch_size,
     class_mode='binary')
 
-model.fit_generator(
+history = model.fit_generator(
     train_generator,
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size)
 
-model.save('model_saved.h5')
+
+# Generiert das Model als Grafik um Aufbau zu verdeutlichen
+plot_model(
+    model,
+    to_file="model.png",
+    show_shapes=False,
+    show_dtype=False,
+    show_layer_names=True,
+    rankdir="TB",
+    expand_nested=False,
+    dpi=96,
+    layer_range=None,
+    show_layer_activations=False,
+)
+
+
+# Trainingsverlauf als witzige Graphen plotten, zeigt Accuracy von Training und Validation
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Accuracy im Verlauf des Trainings')
+plt.ylabel('Accuracy | Genauigkeit')
+plt.xlabel('Epochs | Iterationen')
+plt.legend(['train', 'validate'], loc='upper left')
+plt.show()
+
+# Trainingsverlauf als witzige Graphen plotten, zeigt Loss von Training und Validation
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Loss im Verlauf des Trainings')
+plt.ylabel('Loss | "wie falsch war die Prediction"')
+plt.xlabel('Epochs | Iterationen')
+plt.legend(['train', 'validate'], loc='upper left')
+plt.show()
+
+model.save('wsem_model.h5')
