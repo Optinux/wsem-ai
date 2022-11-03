@@ -1,12 +1,10 @@
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras import backend as K
-
 import matplotlib.pyplot as plt
+from keras import backend as K
+from keras.layers import (Activation, Conv2D, Dense, Dropout, Flatten,
+                          MaxPooling2D)
+from keras.models import Sequential
+from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
-
 
 # festlegen auf 256x256 da optimale performance zu aufwand ratio
 img_width, img_height = 256, 256
@@ -23,17 +21,20 @@ batch_size = 32
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
-    # resize falls nicht stimmt (stimmt eigentlich nie)
+    # resize falls nicht stimmt (stimmt eigentlich nie lol)
     input_shape = (img_width, img_height, 3)
 
 
 # aufbau des models
 model = Sequential()
+# das input bild in mehrer stücke aufteilen
 model.add(Conv2D(32, (2, 2), input_shape=input_shape))
+# "aktiviert" gewisse künstliche Neuronen nach relu
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Conv2D(32, (2, 2)))
+# Den Spaß mehrfach damit das Model auch komplex ist bzw. "mehr" Lernen kann
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -42,13 +43,14 @@ model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
-model.add(Dense(64))
+model.add(Dense(64))    # Hidden Layer
 model.add(Activation('relu'))
-model.add(Dropout(0.5))
+model.add(Dropout(0.5))  # Damit es kein Overfitting / Overlearning gibt
+# Am Ende nur 1 Neuron als Ouput um zwischen Classic oder Modern zu entscheiden, Aufbau ist quasi wie eine invertierte Sanduhr
 model.add(Dense(1))
 model.add(Activation('sigmoid'))
 
-model.compile(loss='binary_crossentropy',
+model.compile(loss='binary_crossentropy',   # compiler macht magisches zeugs um das model zu optimieren
               optimizer='rmsprop',
               metrics=['accuracy'])
 
@@ -73,7 +75,7 @@ validation_generator = test_datagen.flow_from_directory(
     batch_size=batch_size,
     class_mode='binary')
 
-history = model.fit_generator(
+history = model.fit_generator(  # recorded die history mein trainen des models
     train_generator,
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,

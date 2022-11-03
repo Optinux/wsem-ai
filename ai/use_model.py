@@ -1,13 +1,11 @@
-from keras.models import load_model
-from keras.utils import load_img
-from keras.utils import img_to_array
-from keras.applications.vgg16 import preprocess_input
-from keras.applications.vgg16 import decode_predictions
-from keras.applications.vgg16 import VGG16
-import numpy
 import os
-from keras.models import load_model
+
 import matplotlib.pyplot as plt
+import numpy
+from keras.applications.vgg16 import (VGG16, decode_predictions,
+                                      preprocess_input)
+from keras.models import load_model
+from keras.utils import img_to_array, load_img
 
 accuracy_insg = 0  # gesamte accuracy zu beginn auf null
 accuracy_plot = []  # leere plot list
@@ -15,7 +13,7 @@ accuracy_plot = []  # leere plot list
 model = load_model('wsem_model.h5')
 
 # erstellt liste aller files im ausgewählten ordner -> classic oder modern, um auf diese zu predicten
-path = r'G:\GitHub\wsem-ai\test1\validation_set\classic'  # !!!WICHTIG
+path = r'G:\GitHub\wsem-ai\ai\validation_set\classic'  # !!!WICHTIG
 list_files = []  # leere file list
 for root, dirs, files in os.walk(path):
     for file in files:
@@ -34,7 +32,7 @@ for name in list_files:
 
     # insgesamte accuracy -> accuracy alle predicteten bilder zusammen
     accuracy_insg = accuracy_insg + accuracy
-    # fürs spätere plotten ein array befüllen
+    # fürs spätere plotten eine list befüllen
     accuracy_plot.append(accuracy)
     # print(accuracy_plot)    # debug
 

@@ -1,8 +1,8 @@
 dataset
 fingolf1n_models
-test1/model_saved.h5
-test1/training_set
-test1/validation_set
+ai/model_saved.h5
+ai/training_set
+ai/validation_set
 .vs
 
 # Byte-compiled / optimized / DLL files
