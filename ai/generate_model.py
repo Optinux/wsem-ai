@@ -5,81 +5,71 @@ from keras.layers import (Activation, Conv2D, Dense, Dropout, Flatten,
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
+                          
+img_w, img_h = 256, 256 # 256x256 optimale performance <> cost ratio
+train_dir = 'training_set'
+validation_dir = 'validation_set'
+nb_train_samples = 2048  # anzahl images training
+nb_validation_samples = 1024  # anzahl images validation
+epochs = 10  # epochen | iterationen
+batch_size = 32 # anzahl images per step (samples / batch size = steps per epoch)
 
-# festlegen auf 256x256 da optimale performance zu aufwand ratio
-img_width, img_height = 256, 256
-
-train_data_dir = 'training_set'
-validation_data_dir = 'validation_set'
-nb_train_samples = 2048  # anzahl an training images 1024
-nb_validation_samples = 1024  # anzahl an validation images 512
-epochs = 10  # epochen aka wie viele iterationen 10
-
-# samples geteilt durch batch size -> wie viel pro schritt in der epoche durch network geboxt werden 32
-batch_size = 32
-
-if K.image_data_format() == 'channels_first':
-    input_shape = (3, img_width, img_height)
+if K.image_data_format() == 'channels_first':   # überprüfen des datenformats und falls nicht stimmt anpassen
+    input_shape = (3, img_w, img_h)
 else:
-    # resize falls nicht stimmt (stimmt eigentlich nie lol)
-    input_shape = (img_width, img_height, 3)
+    input_shape = (img_w, img_h, 3)
 
 
-# aufbau des models
-model = Sequential()
-# das input bild in mehrer stücke aufteilen
-model.add(Conv2D(32, (2, 2), input_shape=input_shape))
-# "aktiviert" gewisse künstliche Neuronen nach relu
+model = Sequential() # 1 input & output pro layer
+model.add(Conv2D(32, (2, 2), input_shape=input_shape)) # input bild in stücke aufteilen
+model.add(Activation('relu')) # "aktiviert" gewisse künstliche Neuronen nach relu
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(32, (2, 2))) # 2tes Layer
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(32, (2, 2)))
-# Den Spaß mehrfach damit das Model auch komplex ist bzw. "mehr" Lernen kann
+model.add(Conv2D(64, (2, 2))) # 3tes Layer
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(64, (2, 2)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Flatten())
+model.add(Flatten())   
 model.add(Dense(64))    # Hidden Layer
 model.add(Activation('relu'))
 model.add(Dropout(0.5))  # Damit es kein Overfitting / Overlearning gibt
-# Am Ende nur 1 Neuron als Ouput um zwischen Classic oder Modern zu entscheiden, Aufbau ist quasi wie eine invertierte Sanduhr
-model.add(Dense(1))
+model.add(Dense(1)) # Am Ende nur 1 Neuron als Ouput um zwischen Classic oder Modern zu entscheiden, Aufbau ist quasi wie eine invertierte Sanduhr
 model.add(Activation('sigmoid'))
 
 model.compile(loss='binary_crossentropy',   # compiler macht magisches zeugs um das model zu optimieren
-              optimizer='rmsprop',
+              optimizer='adam',
               metrics=['accuracy'])
 
 
-train_datagen = ImageDataGenerator(
+train_datagen = ImageDataGenerator(     # resize, zoom und co. -> input vorbereiten (train)
     rescale=1. / 255,
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True)
 
-test_datagen = ImageDataGenerator(rescale=1. / 255)
+test_gen = ImageDataGenerator(rescale=1. / 255)     # resize, zoom und co. -> input vorbereiten (test) 
 
-train_generator = train_datagen.flow_from_directory(
-    train_data_dir,
-    target_size=(img_width, img_height),
+train_gen = train_datagen.flow_from_directory(      # weiter vorbereiten (training)
+    train_dir,
+    target_size=(img_w, img_h),
     batch_size=batch_size,
     class_mode='binary')
 
-validation_generator = test_datagen.flow_from_directory(
-    validation_data_dir,
-    target_size=(img_width, img_height),
+validation_gen = test_gen.flow_from_directory(      # weiter vorbereiten (validation)
+    validation_dir,
+    target_size=(img_w, img_h),
     batch_size=batch_size,
     class_mode='binary')
 
-history = model.fit_generator(  # recorded die history mein trainen des models
-    train_generator,
+history = model.fit_generator(  # füttert die vorbereiten bilder in das model + recorded die history beim trainen des models -> plotten
+    train_gen,
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
-    validation_data=validation_generator,
+    validation_data=validation_gen,
     validation_steps=nb_validation_samples // batch_size)
 
 
@@ -116,4 +106,4 @@ plt.xlabel('Epochs | Iterationen')
 plt.legend(['train', 'validate'], loc='upper left')
 plt.show()
 
-model.save('wsem_model.h5')
+model.save('wsem_model.h5') # model speicher !!! WICHTIG
