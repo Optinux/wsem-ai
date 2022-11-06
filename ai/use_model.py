@@ -13,7 +13,7 @@ accuracy_plot = []  # leere plot list
 model = load_model('wsem_model.h5')
 
 # erstellt liste aller files im ausgewählten ordner -> classic oder modern, um auf diese zu predicten
-path = r'G:\GitHub\wsem-ai\ai\validation_set\classic'  # !!!WICHTIG
+path = r'G:\GitHub\wsem-ai\ai\validation_set\modern'  # !!!WICHTIG
 list_files = []  # leere file list
 for root, dirs, files in os.walk(path):
     for file in files:
@@ -33,7 +33,7 @@ for name in list_files: # für alle files im ordner
     accuracy_plot.append(accuracy) 
     # print(accuracy_plot)    # debug
     i += 1
-    if i > 20:  # wie oft er predicten soll                                              !!!WICHTIG
+    if i > 1000:  # wie oft er predicten soll                                              !!!WICHTIG
         i = i - 1  # -1 damit auch die richtige anzahl geteilt wird
         break
 print("Insgesamte Accuracy von", i, "predicteten Bildern: ", accuracy_insg / i)
@@ -44,7 +44,7 @@ anzahl_predictions = range(0, i)
 # print(anzahl_predictions)   # debug
 plt.plot(anzahl_predictions, accuracy_plot)
 plt.title(accuracy_insg / i)
-plt.suptitle('Accuracy aller Predictions, wobei durchschnittliche Accuracy: ')
+plt.suptitle('Accuracy "modern", wobei durchschnittliche Accuracy: ')        # !!!WICHTIG
 plt.ylabel('Accuracy | Genauigkeit')
 plt.xlabel('Predictions | Anzahl an Vorhersagen')
 plt.show()
