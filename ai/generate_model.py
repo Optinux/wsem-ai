@@ -81,7 +81,6 @@ plot_model(
     show_dtype=True,
     show_layer_names=True,
     rankdir="TB",
-    expand_nested=False,
     dpi=64,
     layer_range=None,
     show_layer_activations=True,
