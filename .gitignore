@@ -1,6 +1,4 @@
 dataset
-fingolf1n_models
-ai/model_saved.h5
 ai/training_set
 ai/validation_set
 .vs
