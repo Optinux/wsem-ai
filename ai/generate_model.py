@@ -9,9 +9,9 @@ from keras.utils import plot_model
 img_w, img_h = 256, 256 # 256x256 optimale performance <> cost ratio
 train_dir = 'training_set'
 validation_dir = 'validation_set'
-nb_train_samples = 2048  # anzahl images training
-nb_validation_samples = 1024  # anzahl images validation
-epochs = 10  # epochen | iterationen
+nb_train_samples = 4096  # anzahl images training
+nb_validation_samples = 2048  # anzahl images validation
+epochs = 50  # epochen | iterationen
 batch_size = 32 # anzahl images per step (samples / batch size = steps per epoch)
 
 if K.image_data_format() == 'channels_first':   # überprüfen des datenformats und falls nicht stimmt anpassen
@@ -77,14 +77,14 @@ history = model.fit_generator(  # füttert die vorbereiten bilder in das model +
 plot_model(
     model,
     to_file="wsem_model.png",
-    show_shapes=False,
-    show_dtype=False,
+    show_shapes=True,
+    show_dtype=True,
     show_layer_names=True,
     rankdir="TB",
     expand_nested=False,
-    dpi=96,
+    dpi=64,
     layer_range=None,
-    show_layer_activations=False,
+    show_layer_activations=True,
 )
 
 
@@ -106,4 +106,4 @@ plt.xlabel('Epochs | Iterationen')
 plt.legend(['train', 'validate'], loc='upper left')
 plt.show()
 
-model.save('wsem_model.h5') # model speicher !!! WICHTIG
+model.save('wsem_model.h5') # model speichern !!! WICHTIG
